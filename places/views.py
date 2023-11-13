@@ -47,7 +47,7 @@ class CategoryPlaceListView(View):
 
 
 ###### filter-places - 맞춤 필터 장소 목록 페이지
-class CategoryPlaceListView(View):
+class FilterPlaceListView(View):
     def get(self, request):
         try:
             main_category = request.GET.get('main_category', 'speakers')

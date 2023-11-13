@@ -1,4 +1,4 @@
-id,category_id,name,district,address,latitude,longitude,work_time,price,image_url,page_url,description,phone_number
+﻿id,category_id,name,district,address,latitude,longitude,work_time,price,image_url,page_url,description,phone_number
 1,3,쉘터오브메모리즈,용산구,"서울시 용산구 용산동6가 11-376, 국립중앙박물관 입구 건너편 정류장",37.5207967,126.9789582,연중무휴,무료,https://news.seoul.go.kr/culture/files/2016/12/58524894dc27f0.92174645.jpg,https://design.seoul.go.kr/gallery/main/main.jsp,,
 2,3,쉘터오브메모리즈,용산구,"서울시 용산구 용산동6가 11-375, 국립중앙박물관 입구 정류장",37.52070673,126.9796763,연중무휴,무료,https://news.seoul.go.kr/culture/files/2016/12/58524894dc27f0.92174645.jpg,https://design.seoul.go.kr/gallery/main/main.jsp,,
 3,3,남산의 생태,용산구,"서울시 용산구 후암동 406-98, 남산소월길, 후암약수터 버스정류장",37.54846347,126.984184,연중무휴,무료,https://publicart.eseoul.go.kr/common/file/getImage.do?fileSeq=988,https://design.seoul.go.kr/gallery/main/main.jsp,,
@@ -949,7 +949,7 @@ id,category_id,name,district,address,latitude,longitude,work_time,price,image_ur
 948,5,주한영국문화원,중구,서울특별시 중구 서소문로11길 19,37.56378783,126.9720891,공휴일,유료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=fb3b5669fc51483ca1662aa7c6e006a6&thumb=Y,https://www.britishcouncil.kr/,,1522-5009
 949,4,고척도서관,구로구,서울특별시 구로구 고척로45길 31,37.50531999,126.8530393,,유료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=73fa7f1a2485489d97593c26967dfee8&thumb=Y,http://gclib.sen.go.kr/,,02-2615-0524
 950,3,용산도시기억전시관,용산구,"한강로3가 64-1 , 용산센트럴파크 해링턴스퀘어 공공시설동 1,2층",37.52686633,126.9668797,"일, 월, 공휴일",무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101551&thumb=Y,https://blog.naver.com/yongsanpark_gallery,,02-3785-2590
-951,8,광진교 8번가,강동구,서울특별시 강동구 천호2동 527-2 광진교 8번가,37.54514626,127.1126879,매주 월요일,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101545&thumb=Y,https://riverview8.co.kr,,02-476-0722
+951,2,광진교 8번가,강동구,서울특별시 강동구 천호2동 527-2 광진교 8번가,37.54514626,127.1126879,매주 월요일,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101545&thumb=Y,https://riverview8.co.kr,,02-476-0722
 952,3,서울생활사박물관,노원구,서울특별시 노원구 동일로174길 27,37.62017392,127.0769362,,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101547&thumb=Y,https://museum.seoul.go.kr/sulm/index.do,,02-3399-2900
 953,3,공평도시유적전시관,종로구,서울특별시 종로구 우정국로 26,37.57168081,126.9835303,,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101548&thumb=Y,https://museum.seoul.go.kr/www/intro/annexIntro/annex_gongpyeong/annex_gongpyeong_01.jsp?sso=ok,,02-724-0215
 954,3,김영옥 미술관,종로구,서울특별시 종로구 창의문로10길 11,37.59387811,126.9642539,,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000101553&thumb=Y,www.magmasup.com,,02-391-1218
@@ -1755,7 +1755,7 @@ id,category_id,name,district,address,latitude,longitude,work_time,price,image_ur
 1754,8,서울시립대학교,동대문구,서울특별시 동대문구 서울시립대로 163,37.58257758,127.0599881,공휴일 등,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=a39f66620e2e4a869f21a6def1251234&thumb=Y,https://www.uos.ac.kr/main.do?epTicket=LOG,,02-6490-2702
 1755,8,동국대학교 박물관,중구,서울특별시 중구 필동로1길 30,37.55893664,126.9987376,"토,일요일",무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=ATH_SPC_000000000000000000100549&thumb=Y,dgumuseum.dongguk.edu,,02-2260-3722
 1756,8,정동제일교회,중구,서울특별시 중구 정동길 46,37.56518302,126.9724498,,무료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=0277a7f659504b4fb5a02ce5da383896&thumb=Y,http://chungdong.org/html/main.asp,,02-753-0001
-1757,8,롯데시네마 가산디지털점,금천구,서울특별시 금천구 디지털로10길 9,37.47761902,126.8890553,,유료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=dfd038443b85480594858c2463e99d6b&thumb=Y,https://www.lottecinema.co.kr/NLCHS,,1544-8855
+1757,2,롯데시네마 가산디지털점,금천구,서울특별시 금천구 디지털로10길 9,37.47761902,126.8890553,,유료,https://culture.seoul.go.kr/cmmn/file/getImage.do?atchFileId=dfd038443b85480594858c2463e99d6b&thumb=Y,https://www.lottecinema.co.kr/NLCHS,,1544-8855
 1758,8,해창양복점,중구,중구 남대문로7길 33,37.56379583,126.980017,,유료,https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Inside_of_haechang_bespoke_tailor.jpg/800px-Inside_of_haechang_bespoke_tailor.jpg,,,02-776-1667
 1759,8,한영양복점,중구,중구 퇴계로20길 2,37.55971637,126.9854347,,유료,https://img.khan.co.kr/news/2017/12/03/l_2017120201000215800011504.webp,,,02-2266-0870
 1760,8,상동교회(구 새로나백화점),중구,중구 남대문로 30,37.56083481,126.9790477,,무료,https://img.khan.co.kr/news/2020/03/23/l_2020032301002959900240628.jpg,,,

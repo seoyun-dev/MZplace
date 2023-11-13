@@ -32,7 +32,7 @@ class Filter(models.Model):
         db_table = 'filters'
 
 
-class FillterPlace(models.Model):
+class FilterPlace(models.Model):
     filter = models.ForeignKey('Filter', on_delete=models.CASCADE)
     place  = models.ForeignKey('Place', on_delete=models.CASCADE)
 

@@ -12,24 +12,29 @@ class CategoryPlaceListView(View):
         try: 
             category = Category.objects.get(id=category_id)
             offset   = int(request.GET.get('offset', 0))
-            price    = request.GET.get('price', '')
+            price    = request.GET.get('price', 'X')
 
             q = Q()
 
             q &= Q(category__name = category.name)
 
             if price:
-                q &= Q(place__price__contains = price)
+                if price == 'pay':
+                    price = '유료'
+                    q &= Q(price__icontains = price)
+                if price == 'free':
+                    price = '무료'
+                    q &= Q(price__icontains = price)
 
             places      = Place.objects.filter(q).distinct()
             places_list = places[offset:offset+12]
             
             result = [
                 {
-                    'id'      : place.id,
-                    'name'    : place.name,
-                    'image_url' : place.image_url,
-                    # 'heart': 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0
+                    'id'       : place.id,
+                    'name'     : place.name,
+                    'image_url': place.image_url,
+                    # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0
                 }for place in places_list
             ]
 

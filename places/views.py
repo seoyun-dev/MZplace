@@ -12,11 +12,11 @@ class CategoryPlaceListView(View):
         try: 
             category = Category.objects.get(id=category_id)
             offset   = int(request.GET.get('offset', 0))
-            price    = request.GET.get('filter', '')
+            price    = request.GET.get('price', '')
 
             q = Q()
 
-            q |= Q(category__name = category.name)
+            q &= Q(category__name = category.name)
 
             if price:
                 q &= Q(place__price__contains = price)
@@ -24,7 +24,6 @@ class CategoryPlaceListView(View):
             places      = Place.objects.filter(q).distinct()
             places_list = places[offset:offset+12]
             
-
             result = [
                 {
                     'id'      : place.id,

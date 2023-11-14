@@ -22,9 +22,11 @@ class CategoryPlaceListView(View):
                 if price == 'pay':
                     price = '유료'
                     q &= Q(price__icontains = price)
-                if price == 'free':
+                elif price == 'free':
                     price = '무료'
                     q &= Q(price__icontains = price)
+                else:
+                    return JsonResponse({'message':'CHECK_PRICE'}, status=404)
 
             places      = Place.objects.filter(q).distinct()
             places_list = places[offset:offset+12]
@@ -40,8 +42,9 @@ class CategoryPlaceListView(View):
 
             return JsonResponse(
                 {
-                    'result'               : result,
-                    'total_places'          : places.count()
+                    'message'     : 'SUCCESS',
+                    'result'      : result,
+                    'total_places': places.count()
                 }, status=200)
         
         except Category.DoesNotExist:

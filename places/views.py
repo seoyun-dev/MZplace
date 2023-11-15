@@ -167,12 +167,16 @@ class PlaceDetailView(View):
                 'page_url'    : place.page_url,
                 'description' : place.description,
                 'category_id' : place.category.id,
+                # TODO heart 구현
+                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0
                 'related_course' : [{
                     'id'           : course.course.id,
                     'name'         : course.course.name,
                     'duration_time': course.course.duration_time,
                     'price'        : course.course.price,
                     'image_url'    : course.course.image_url,
+                    # TODO heart 구현
+                    # 'heart'    : 1 if Heart.objects.filter(course__id=course.course.id).filter(user=request.user) else 0
                 } for course in place.courseplace_set.all()]
             }
 

@@ -203,8 +203,8 @@ class NearbyPlaceListView(View):
         q &= Q(longitude__gte=ws_longitude)
         q &= Q(longitude__lte=ne_longitude)
 
-        places = Place.objects.filter(q)
-
+        places = Place.objects.filter(q).distinct()
+        
         result = [
             {
                 'id'       : place.id,

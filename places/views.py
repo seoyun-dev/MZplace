@@ -26,7 +26,7 @@ class CategoryPlaceListView(View):
                     price = '무료'
                     q &= Q(price__icontains = price)
                 else:
-                    return JsonResponse({'message':'CHECK_PRICE'}, status=404)
+                    return JsonResponse({'message':'CHECK_PRICE'}, status=400)
 
             places      = Place.objects.filter(q).distinct()
             places_list = places[12*(page-1):12*page]
@@ -72,7 +72,7 @@ class FilterPlaceListView(View):
                 price = '무료'
                 q &= Q(price__icontains = price)
             else:
-                return JsonResponse({'message':'CHECK_PRICE'}, status=404)
+                return JsonResponse({'message':'CHECK_PRICE'}, status=400)
         
         sub_filter_q = Q()
         if filters:
@@ -82,7 +82,7 @@ class FilterPlaceListView(View):
                 if filter in [1,2,3,4,5,6,7]:
                     sub_filter_q |= Q(filterplace__filter__id = filter)
                 else:
-                    return JsonResponse({'message':'CHECK_FILTER_ID'}, status=404)
+                    return JsonResponse({'message':'CHECK_FILTER_ID'}, status=400)
         q &= sub_filter_q
 
         sub_district_q = Q()
@@ -119,43 +119,67 @@ class FilterPlaceListView(View):
 
 
 # ###### course<course_id> - 코스 상세 페이지
-# class PlaceDetailView(View):
-#     def get(self, request, product_id):
-#         try:
-#             product = Product.objects.get(id = product_id)
-#             product_detail = {
-#                 'id'           : product.id,
-#                 'name'         : product.name,
-#                 'product_image': [product.image_url for product in product.productimage_set.all()],
-#                 'description'  : product.description,
-#                 'content_url'  : product.content_url,
-#                 'price'        : product.price,
-#                 'stock'        : product.stock
-#             }
-#             return JsonResponse({"result" : product_detail}, status=200)
+class CourseDetailView(View):
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id = course_id)
+            course_detail = {
+                'id'           : course.id,
+                'name'         : course.name,
+                'duration_time': course.duration_time,
+                'price'        : course.price,
+                'image_url'    : course.image_url,
+                # TODO heart 구현
+                # 'heart'    : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0
+                'places': [
+                    {
+                        'order_number'   : place.order_number,
+                        'place_id'       : place.place.id,
+                        'place_name'     : place.place.name,
+                        'place_image_url': place.place.image_url,
+                        # TODO heart 구현
+                        # 'heart'    : 1 if Heart.objects.filter(place__id=place.place.id).filter(user=request.user) else 0
+                    }
+                    for place in course.courseplace_set.all()
+                ]
+            }
+            return JsonResponse({'message' : 'SUCCESS', "result" : course_detail}, status=200)
         
-#         except Product.DoesNotExist:
-#             return JsonResponse({"message" : "DoesNotExist"}, status=400)
+        except Course.DoesNotExist:
+            return JsonResponse({"message" : "COURSE_DOES_NOT_EXIST"}, status=404)
         
 
-# ###### place<place_id> - 장소 상세 페이지
-# class PlaceDetailView(View):
-#     def get(self, request, product_id):
-#         try:
-#             product = Product.objects.get(id = product_id)
-#             product_detail = {
-#                 'id'           : product.id,
-#                 'name'         : product.name,
-#                 'product_image': [product.image_url for product in product.productimage_set.all()],
-#                 'description'  : product.description,
-#                 'content_url'  : product.content_url,
-#                 'price'        : product.price,
-#                 'stock'        : product.stock
-#             }
-#             return JsonResponse({"result" : product_detail}, status=200)
+###### place<place_id> - 장소 상세 페이지
+class PlaceDetailView(View):
+    def get(self, request, place_id):
+        try:
+            place = Place.objects.get(id = place_id)
+            result = {
+                'id'          : place.id,
+                'name'        : place.name,
+                'district'    : place.district,
+                'latitude'    : place.latitude,
+                'longitude'   : place.longitude,
+                'work_time'   : place.work_time,
+                'price'       : place.price,
+                'phone_number': place.phone_number,
+                'image_url'   : place.image_url,
+                'page_url'    : place.page_url,
+                'description' : place.description,
+                'category_id' : place.category.id,
+                'related_course' : [{
+                    'id'           : course.course.id,
+                    'name'         : course.course.name,
+                    'duration_time': course.course.duration_time,
+                    'price'        : course.course.price,
+                    'image_url'    : course.course.image_url,
+                } for course in place.courseplace_set.all()]
+            }
+
+            return JsonResponse({'message' : 'SUCCESS', "result" :result}, status=200)
         
-#         except Product.DoesNotExist:
-#             return JsonResponse({"message" : "DoesNotExist"}, status=400)
+        except Place.DoesNotExist:
+            return JsonResponse({"message" : "PLACE_DOES_NOT_EXIST"}, status=400)
 
 
 

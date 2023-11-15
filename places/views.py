@@ -187,9 +187,44 @@ class PlaceDetailView(View):
 
 
 
-# ###### top-places - TOP 20 장소 목록 페이지
+####### nearby - 거리 가까운 장소 목록 페이지
+class NearbyPlaceListView(View):
+    def get(self, request):
+        ws_latitude  = request.GET.get('ws_latitude')
+        ws_longitude = request.GET.get('ws_longitude')
+        ne_latitude  = request.GET.get('ne_latitude')
+        ne_longitude = request.GET.get('ne_longitude')
+        
+
+        q = Q()
+
+        q &= Q(latitude__gte=ws_latitude)
+        q &= Q(latitude__lte=ne_latitude)
+        q &= Q(longitude__gte=ws_longitude)
+        q &= Q(longitude__lte=ne_longitude)
+
+        places = Place.objects.filter(q)
+
+        result = [
+            {
+                'id'       : place.id,
+                'name'     : place.name,
+                'image_url': place.image_url,
+                'latitude' : place.latitude,
+                'longitude': place.longitude
+            }for place in places
+        ]
+
+        return JsonResponse(
+            {
+                'message'     : 'SUCCESS',
+                'result'      : result,
+                'total_places': places.count()
+            }, status=200)
+
+
+
+####### top-places - TOP 20 장소 목록 페이지
 
 ###### recommend-places - 찜기반 추천 장소 목록 페이지
-
-###### distance-places - 거리별 추천 장소 목록 페이지
 

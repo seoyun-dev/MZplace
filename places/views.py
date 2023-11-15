@@ -11,8 +11,8 @@ class CategoryPlaceListView(View):
     def get(self, request, category_id):
         try: 
             category = Category.objects.get(id=category_id)
-            page   = int(request.GET.get('page', 0))
-            price    = request.GET.get('price', 'X')
+            page     = int(request.GET.get('page'))
+            price    = request.GET.get('price')
 
             q = Q()
 
@@ -36,6 +36,7 @@ class CategoryPlaceListView(View):
                     'id'       : place.id,
                     'name'     : place.name,
                     'image_url': place.image_url,
+                    # TODO heart 구현
                     # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0
                 }for place in places_list
             ]
@@ -53,44 +54,67 @@ class CategoryPlaceListView(View):
 
 
 
-###### filter-places - 맞춤 필터 장소 목록 페이지
+###### filter - 맞춤 필터 장소 목록 페이지
 class FilterPlaceListView(View):
     def get(self, request):
-        try:
-            main_category = request.GET.get('main_category', 'speakers')
-            sub_category  = request.GET.get('sub_category')
-            sort_method   = request.GET.get('sort_method', '-release_date')
-            limit         = int(request.GET.get('limit', 9))
-            offset        = int(request.GET.get('offset', 0))
+        price     = request.GET.get('price')
+        filters   = request.GET.get('filters')
+        districts = request.GET.get('districts')
+        page      = int(request.GET.get('page'))
 
-            q = Q()
+        q = Q()
 
-            if main_category:
-                q &= Q(sub_category__category__name=main_category)
-
-            elif sub_category:
-                q &= Q(sub_category__name=sub_category)
-
-            products      = Product.objects.filter(q).order_by(sort_method)
-            products_list = products[offset:offset+12]
-            print(products_list[5].productimage_set.first().image_url)
-            res_products = [
-                {
-                    'id'          : product.id,
-                    'name'        : product.name,
-                    'description' : product.description,
-                    'price'       : product.price,
-                    'image_url'   : [image.image_url for image in product.productimage_set.all()],
-                    'release_date': product.release_date,
-                } for product in products_list
-            ]
-
-            return JsonResponse({'RESULT':res_products, 'totalItems' : products.count()}, status=200)
+        if price:
+            if price == 'pay':
+                price = '유료'
+                q &= Q(price__icontains = price)
+            elif price == 'free':
+                price = '무료'
+                q &= Q(price__icontains = price)
+            else:
+                return JsonResponse({'message':'CHECK_PRICE'}, status=404)
         
-        except Category.DoesNotExist:
-            return JsonResponse({'message':'CATEGORY_DOES_NOT_EXIST'}, status=404)
-        except SubCategory.DoesNotExist:
-            return JsonResponse({'message':'SUB_CATEGORY_DOES_NOT_EXIST'}, status=404)
+        sub_filter_q = Q()
+        if filters:
+            filters = filters.split(',')
+            for filter in filters:
+                filter = int(filter)
+                if filter in [1,2,3,4,5,6,7]:
+                    sub_filter_q |= Q(filterplace__filter__id = filter)
+                else:
+                    return JsonResponse({'message':'CHECK_FILTER_ID'}, status=404)
+        q &= sub_filter_q
+
+        sub_district_q = Q()
+        if districts:
+            districts = districts.split(',')
+            for district in districts:
+                sub_district_q |= Q(district__icontains = district)
+        q &= sub_district_q
+
+        places      = Place.objects.filter(q)
+        places_list = places[12*(page-1):12*page]
+
+        result = [
+            {
+                'id'       : place.id,
+                'name'     : place.name,
+                'image_url': place.image_url,
+                # TODO heart 구현
+                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0,
+                # 'price'    : place.price,
+                # 'filter'   : [filter.name for filter in Filter.objects.filter(filterplace__place__id=place.id)],
+                # 'district' : place.district,
+            } for place in places_list
+        ]
+
+        return JsonResponse(
+            {
+                'message'   : 'SUCCESS',
+                'result'    : result,
+                'totalItems': places.count()
+                }, status=200)
+                
 
 
 

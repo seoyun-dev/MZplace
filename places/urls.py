@@ -5,7 +5,7 @@ urlpatterns = [
     # 카테고리별 장소 목록 페이지
     path('/category<int:category_id>', CategoryPlaceListView.as_view()),
     # 맞춤 필터 장소 목록 페이지
-    path('/filter', FilterPlaceListView.as_view()),
+    path('/filtering', FilterPlaceListView.as_view())
     # course<course_id> - 코스 상세 페이지
 
     # place<place_id> - 장소 상세 페이지

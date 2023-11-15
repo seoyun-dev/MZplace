@@ -11,7 +11,7 @@ class CategoryPlaceListView(View):
     def get(self, request, category_id):
         try: 
             category = Category.objects.get(id=category_id)
-            offset   = int(request.GET.get('offset', 0))
+            page   = int(request.GET.get('page', 0))
             price    = request.GET.get('price', 'X')
 
             q = Q()
@@ -29,7 +29,7 @@ class CategoryPlaceListView(View):
                     return JsonResponse({'message':'CHECK_PRICE'}, status=404)
 
             places      = Place.objects.filter(q).distinct()
-            places_list = places[offset:offset+12]
+            places_list = places[12*(page-1):12*page]
             
             result = [
                 {
@@ -72,7 +72,7 @@ class FilterPlaceListView(View):
                 q &= Q(sub_category__name=sub_category)
 
             products      = Product.objects.filter(q).order_by(sort_method)
-            products_list = products[offset:offset+limit]
+            products_list = products[offset:offset+12]
             print(products_list[5].productimage_set.first().image_url)
             res_products = [
                 {

@@ -1,8 +1,8 @@
 import json
 import re
 
-# import bcrypt
-# import jwt
+import bcrypt
+import jwt
 from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views           import View
@@ -18,16 +18,15 @@ class SignUpView(View):
             user_id  = data['user_id']
             password = data['password']
 
-
             if User.objects.filter(user_id=user_id).exists():
                 return JsonResponse({"message" : "THIS_USER_ID_ALREADY_EXISTS"}, status=400)
             
-            # hashed_password = bcrypt.hashpw(password.encode('UTF-8'), bcrypt.gensalt()).decode('UTF-8')
+            hashed_password = bcrypt.hashpw(password.encode('UTF-8'), bcrypt.gensalt()).decode('UTF-8')
 
             User.objects.create(
                 nickname = nickname,
                 user_id  = user_id,
-                password = password
+                password = hashed_password
             )
 
             return JsonResponse({"message" : "SIGNUP_SUCCESS"}, status=201)
@@ -95,12 +94,12 @@ class LogInView(View):
             data = json.loads(request.body)
             user = User.objects.get(user_id=data['user_id'])
 
-            # if not bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
-            #     return JsonResponse({'message':'INVALID_USER'}, status=401)
+            if not bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
+                return JsonResponse({'message':'INVALID_USER'}, status=401)
 
-            # access_token = jwt.encode({'id': user.id}, settings.SECRET_KEY, settings.ALGORITHM)
+            access_token= jwt.encode({'id': user.id}, settings.SECRET_KEY, settings.ALGORITHM)
 
-            # return JsonResponse({'message':'SUCCESS', 'ACCESS_TOKEN':access_token}, status=200)
+            return JsonResponse({'message':'SUCCESS', 'ACCESS_TOKEN':access_token}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({'message':'JSONDecodeError'}, status=404)

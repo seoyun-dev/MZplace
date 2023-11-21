@@ -34,13 +34,10 @@ class SignUpView(View):
             return JsonResponse({"message" : "SIGNUP_SUCCESS"}, status=201)
 
         except json.JSONDecodeError:
-            return JsonResponse({"message" : "JSONDecodeError"}, status=404)
+            return JsonResponse({"message" : "JSONDecodeError"}, status=400)
     
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
-
-        except ValidationError as error:
-            return JsonResponse({"message" : error.message}, status=400)
 
 
 
@@ -60,7 +57,7 @@ class KakaoSocialLoginView(View):
             return JsonResponse({"message" : "LOGIN_SUCCESS"}, status=200)
 
         except json.JSONDecodeError:
-            return JsonResponse({"message" : "JSONDecodeError"}, status=404)
+            return JsonResponse({"message" : "JSONDecodeError"}, status=400)
     
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
@@ -83,7 +80,7 @@ class NaverSocialLoginView(View):
             return JsonResponse({"message" : "LOGIN_SUCCESS"}, status=200)
 
         except json.JSONDecodeError:
-            return JsonResponse({"message" : "JSONDecodeError"}, status=404)
+            return JsonResponse({"message" : "JSONDecodeError"}, status=400)
     
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
@@ -104,7 +101,7 @@ class LogInView(View):
             return JsonResponse({'message':'SUCCESS', 'ACCESS_TOKEN':access_token}, status=200)
 
         except json.JSONDecodeError:
-            return JsonResponse({'message':'JSONDecodeError'}, status=404)
+            return JsonResponse({'message':'JSONDecodeError'}, status=400)
         except User.DoesNotExist:
             return JsonResponse({'message':'USER_DOES_NOT_EXIST'}, status=404)
         except KeyError:
@@ -125,13 +122,12 @@ class DeleteView(View):
             elif request.user.naver_id:
                 user = User.objects.get(naver_id=request.user.naver_id)
 
-            print(user)
-            print(request.user)
             if request.user == user:  # 현재 로그인한 사용자와 삭제 대상 사용자가 같은 경우
                 user.delete()
                 return JsonResponse({'message':'USER_DELETED'}, status=204)
             else:
                 return JsonResponse({'message':'USER_DOES_NOT_HAVE_PERMISSION'}, status=401)
+            
 
         except User.DoesNotExist:
             return JsonResponse({'message':'USER_DOES_NOT_EXIST'}, status=401)

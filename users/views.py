@@ -8,7 +8,9 @@ from django.core.exceptions import ValidationError
 from django.views           import View
 from django.conf            import settings
 
-from users.models     import User
+from users.models           import User
+from users.utils            import signin_decorator
+
 
 class SignUpView(View):
     def post(self, request):
@@ -107,3 +109,29 @@ class LogInView(View):
             return JsonResponse({'message':'USER_DOES_NOT_EXIST'}, status=404)
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
+
+
+
+class DeleteView(View):
+    @signin_decorator
+    def delete(self, request):
+        try:
+            if not request.user:
+                return JsonResponse({'message':'WRITE_ID_OR_TOKEN'}, status=401)
+            if request.user.user_id:
+                user = User.objects.get(user_id=request.user.user_id)
+            elif request.user.kakao_id:
+                user = User.objects.get(kakao_id=request.user.kakao_id)
+            elif request.user.naver_id:
+                user = User.objects.get(naver_id=request.user.naver_id)
+
+            print(user)
+            print(request.user)
+            if request.user == user:  # 현재 로그인한 사용자와 삭제 대상 사용자가 같은 경우
+                user.delete()
+                return JsonResponse({'message':'USER_DELETED'}, status=204)
+            else:
+                return JsonResponse({'message':'USER_DOES_NOT_HAVE_PERMISSION'}, status=401)
+
+        except User.DoesNotExist:
+            return JsonResponse({'message':'USER_DOES_NOT_EXIST'}, status=401)

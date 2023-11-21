@@ -4,10 +4,12 @@ from django.db.models import Q
 
 from places.models import Category, Place, FilterPlace, Filter, Course, CoursePlace
 from hearts.models import Heart
+from users.utils   import signin_decorator
+
 
 ###### cateogry - 카테고리별 장소 목록 페이지
-# TODO signin_decorator 완료되면 heart 추가
 class CategoryPlaceListView(View):
+    @signin_decorator
     def get(self, request, category_id):
         try: 
             category = Category.objects.get(id=category_id)
@@ -37,7 +39,7 @@ class CategoryPlaceListView(View):
                     'name'     : place.name,
                     'image_url': place.image_url,
                     # TODO heart 구현
-                    # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0
+                    # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
                 }for place in places_list
             ]
 
@@ -55,6 +57,7 @@ class CategoryPlaceListView(View):
 
 ####### courses - 코스 목록 페이지
 class CourseListView(View):
+    @signin_decorator
     def get(self, request):
         page     = int(request.GET.get('page'))
         price    = request.GET.get('price')
@@ -82,7 +85,7 @@ class CourseListView(View):
                 'price'        : course.price,
                 'image_url'    : course.image_url,
                 # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(course__id=place.id).filter(user=request.user) else 0
+                # 'heart'    : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0
             }for course in courses_list
         ]
 
@@ -97,6 +100,7 @@ class CourseListView(View):
 
 ###### filter - 맞춤 필터 장소 목록 페이지
 class FilterPlaceListView(View):
+    @signin_decorator
     def get(self, request):
         price     = request.GET.get('price')
         filters   = request.GET.get('filters')
@@ -142,7 +146,7 @@ class FilterPlaceListView(View):
                 'name'     : place.name,
                 'image_url': place.image_url,
                 # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0,
+                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0,
                 # 'price'    : place.price,
                 # 'filter'   : [filter.name for filter in Filter.objects.filter(filterplace__place__id=place.id)],
                 # 'district' : place.district,
@@ -161,6 +165,7 @@ class FilterPlaceListView(View):
 
 # ###### course<course_id> - 코스 상세 페이지
 class CourseDetailView(View):
+    @signin_decorator
     def get(self, request, course_id):
         try:
             course = Course.objects.get(id = course_id)
@@ -171,7 +176,7 @@ class CourseDetailView(View):
                 'price'        : course.price,
                 'image_url'    : course.image_url,
                 # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0
+                # 'heart'    : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0
                 'places': [
                     {
                         'order_number'   : place.order_number,
@@ -179,7 +184,7 @@ class CourseDetailView(View):
                         'place_name'     : place.place.name,
                         'place_image_url': place.place.image_url,
                         # TODO heart 구현
-                        # 'heart'    : 1 if Heart.objects.filter(place__id=place.place.id).filter(user=request.user) else 0
+                        # 'heart'    : 1 if Heart.objects.filter(place__id=place.place.id).filter(user=request.user) else 0 if not request.user else 0
                     }
                     for place in course.courseplace_set.all()
                 ]
@@ -192,6 +197,7 @@ class CourseDetailView(View):
 
 ###### place<place_id> - 장소 상세 페이지
 class PlaceDetailView(View):
+    @signin_decorator
     def get(self, request, place_id):
         try:
             place = Place.objects.get(id = place_id)
@@ -209,7 +215,7 @@ class PlaceDetailView(View):
                 'description' : place.description,
                 'category_id' : place.category.id,
                 # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0
+                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
                 'related_course' : [{
                     'id'           : course.course.id,
                     'name'         : course.course.name,
@@ -217,7 +223,7 @@ class PlaceDetailView(View):
                     'price'        : course.course.price,
                     'image_url'    : course.course.image_url,
                     # TODO heart 구현
-                    # 'heart'    : 1 if Heart.objects.filter(course__id=course.course.id).filter(user=request.user) else 0
+                    # 'heart'    : 1 if Heart.objects.filter(course__id=course.course.id).filter(user=request.user) else 0 if not request.user else 0
                 } for course in place.courseplace_set.all()]
             }
 
@@ -230,6 +236,7 @@ class PlaceDetailView(View):
 
 ####### nearby - 거리 가까운 장소 목록 페이지
 class NearbyPlaceListView(View):
+    @signin_decorator
     def get(self, request):
         ws_latitude  = request.GET.get('ws_latitude')
         ws_longitude = request.GET.get('ws_longitude')
@@ -252,7 +259,9 @@ class NearbyPlaceListView(View):
                 'name'     : place.name,
                 'image_url': place.image_url,
                 'latitude' : place.latitude,
-                'longitude': place.longitude
+                'longitude': place.longitude,
+                # TODO 추가구현
+                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
             }for place in places
         ]
 
@@ -266,6 +275,13 @@ class NearbyPlaceListView(View):
 
 
 ####### top-places - TOP 20 장소 목록 페이지
+class top20ListView(View):
+    @signin_decorator
+    def get(self,request):
+        pass
 
 ###### recommend-places - 찜기반 추천 장소 목록 페이지
-
+class RecommendPlaceListView(View):
+    @signin_decorator
+    def get(self,request):
+        pass

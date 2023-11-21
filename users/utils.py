@@ -7,24 +7,23 @@ from users.models       import User
 
 def signin_decorator(func):
     def wrapper(self, request, *args, **kwargs):
-        try:
-            kakao_id    = request.headers.get('kakao_Authorization', None)
-            naver_id    = request.headers.get('naver_Authorization', None)
-            local_token = request.headers.get('local_Authorization', None)
-            
-            if kakao_id:
-                user = User.objects.get(kakao_id=kakao_id)
-            elif naver_id:
-                user = User.objects.get(naver_id=naver_id)
-            elif local_token:
-                payload = jwt.decode(local_token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-                user    = User.objects.get(id=payload['id'])
-                user    = User.objects.get(kakao_id=kakao_id)
-            
-            request.user = user
+        user = None
+        # kakao-id, naver-id, local-token 로 프론트에서 요청
+        kakao_id    = request.META.get('HTTP_KAKAO_ID', None)
+        naver_id    = request.META.get('HTTP_NAVER_ID', None)
+        local_token = request.META.get('HTTP_LOCAL_TOKEN', None)
         
-        except User.DoesNotExist:
-            return JsonResponse({'message':'INVALID_USER'}, status=400)
+        if kakao_id:
+            kakao_id = int(kakao_id)
+            user     = User.objects.get(kakao_id=kakao_id)
+        elif naver_id:
+            naver_id = int(naver_id)
+            user     = User.objects.get(naver_id=naver_id)
+        elif local_token:
+            payload = jwt.decode(local_token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+            user    = User.objects.get(id=payload['id'])
+        
+        request.user = user
 
         return func(self, request, *args, **kwargs)
 

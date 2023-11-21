@@ -53,6 +53,47 @@ class CategoryPlaceListView(View):
 
 
 
+####### courses - 코스 목록 페이지
+class CourseListView(View):
+    def get(self, request):
+        page     = int(request.GET.get('page'))
+        price    = request.GET.get('price')
+
+        q = Q()
+
+        if price:
+            if price == 'pay':
+                price = '유료'
+                q &= Q(price__icontains = price)
+            elif price == 'free':
+                price = '무료'
+                q &= Q(price__icontains = price)
+            else:
+                return JsonResponse({'message':'CHECK_PRICE'}, status=400)
+
+        courses      = Course.objects.filter(q).distinct()
+        courses_list = courses[12*(page-1):12*page]
+        
+        result = [
+            {
+                'id'           : course.id,
+                'name'         : course.name,
+                'duration_time': course.duration_time,
+                'price'        : course.price,
+                'image_url'    : course.image_url,
+                # TODO heart 구현
+                # 'heart'    : 1 if Heart.objects.filter(course__id=place.id).filter(user=request.user) else 0
+            }for course in courses_list
+        ]
+
+        return JsonResponse(
+            {
+                'message'     : 'SUCCESS',
+                'result'      : result,
+                'total_places': courses.count()
+            }, status=200)
+
+
 
 ###### filter - 맞춤 필터 장소 목록 페이지
 class FilterPlaceListView(View):

@@ -124,7 +124,7 @@ class DeleteView(View):
 
             if request.user == user:  # 현재 로그인한 사용자와 삭제 대상 사용자가 같은 경우
                 user.delete()
-                return JsonResponse({'message':'USER_DELETED'}, status=204)
+                return JsonResponse({'message':'USER_DELETED'}, status=200)
             else:
                 return JsonResponse({'message':'USER_DOES_NOT_HAVE_PERMISSION'}, status=401)
             

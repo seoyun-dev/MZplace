@@ -69,7 +69,7 @@ class HeartView(View):
                 place = Place.objects.get(id=data.get('place_id'))
                 Heart.objects.filter(user=request.user, place=place).delete()
             
-            return JsonResponse({"message":"DELETE_SUCCESS"}, status=204)
+            return JsonResponse({"message":"DELETE_SUCCESS"}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"message":"JSONDecodeError"}, status=400)

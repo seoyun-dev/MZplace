@@ -38,7 +38,7 @@ class HeartView(View):
     def get(self, request):
         hearts = [{
             'heart_id'       : heart.id,
-            'place or course': {
+            'place_or_course': {
                     'type'           : 'place',
                     'id'             : heart.place.id,
                     'name'           : heart.place.name,

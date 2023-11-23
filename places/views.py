@@ -276,16 +276,18 @@ class Top20ListView(View):
 
         result = [
             {
-                'place_id'       : Place.objects.get(id=place_or_course['place']).id,
-                'place_name'     : Place.objects.get(id=place_or_course['place']).name,
-                'place_image_url': Place.objects.get(id=place_or_course['place']).image_url,
+                'type'     : 'place',
+                'id'       : Place.objects.get(id=place_or_course['place']).id,
+                'name'     : Place.objects.get(id=place_or_course['place']).name,
+                'image_url': Place.objects.get(id=place_or_course['place']).image_url,
                 'heart'          : 1 if Heart.objects.filter(place__id=Place.objects.get(id=place_or_course['place']) .id).filter(user=request.user) else 0 if not request.user else 0
             } 
             if place_or_course['place']
             else {
-                'course_id'       : Course.objects.get(id=place_or_course['course']).id,
-                'course_name'     : Course.objects.get(id=place_or_course['course']).name,
-                'course_image_url': Course.objects.get(id=place_or_course['course']).image_url,
+                'type'     : 'course',
+                'id'       : Course.objects.get(id=place_or_course['course']).id,
+                'name'     : Course.objects.get(id=place_or_course['course']).name,
+                'image_url': Course.objects.get(id=place_or_course['course']).image_url,
                 'heart'           : 1 if Heart.objects.filter(place__id=Course.objects.get(id=place_or_course['course']).id).filter(user=request.user) else 0 if not request.user else 0
             }
             for place_or_course in top_20_places_courses

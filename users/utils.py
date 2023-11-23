@@ -12,7 +12,7 @@ def signin_decorator(func):
         kakao_id    = request.META.get('HTTP_KAKAO_ID', None)
         naver_id    = request.META.get('HTTP_NAVER_ID', None)
         local_token = request.META.get('HTTP_LOCAL_TOKEN', None)
-        
+
         if kakao_id:
             kakao_id = int(kakao_id)
             user     = User.objects.get(kakao_id=kakao_id)
@@ -24,7 +24,6 @@ def signin_decorator(func):
             user    = User.objects.get(id=payload['id'])
         
         request.user = user
-
         return func(self, request, *args, **kwargs)
 
     return wrapper

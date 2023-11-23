@@ -38,8 +38,7 @@ class CategoryPlaceListView(View):
                     'id'       : place.id,
                     'name'     : place.name,
                     'image_url': place.image_url,
-                    # TODO heart 구현
-                    # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
+                    'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
                 }for place in places_list
             ]
 
@@ -84,8 +83,7 @@ class CourseListView(View):
                 'duration_time': course.duration_time,
                 'price'        : course.price,
                 'image_url'    : course.image_url,
-                # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0
+                'heart'        : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0
             }for course in courses_list
         ]
 
@@ -145,11 +143,7 @@ class FilterPlaceListView(View):
                 'id'       : place.id,
                 'name'     : place.name,
                 'image_url': place.image_url,
-                # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0,
-                # 'price'    : place.price,
-                # 'filter'   : [filter.name for filter in Filter.objects.filter(filterplace__place__id=place.id)],
-                # 'district' : place.district,
+                'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
             } for place in places_list
         ]
 
@@ -175,16 +169,14 @@ class CourseDetailView(View):
                 'duration_time': course.duration_time,
                 'price'        : course.price,
                 'image_url'    : course.image_url,
-                # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0
-                'places': [
+                'heart'        : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0,
+                'places'       : [
                     {
                         'order_number'   : place.order_number,
                         'place_id'       : place.place.id,
                         'place_name'     : place.place.name,
                         'place_image_url': place.place.image_url,
-                        # TODO heart 구현
-                        # 'heart'    : 1 if Heart.objects.filter(place__id=place.place.id).filter(user=request.user) else 0 if not request.user else 0
+                        'heart'          : 1 if Heart.objects.filter(place__id=place.place.id).filter(user=request.user) else 0 if not request.user else 0
                     }
                     for place in course.courseplace_set.all()
                 ]
@@ -214,16 +206,14 @@ class PlaceDetailView(View):
                 'page_url'    : place.page_url,
                 'description' : place.description,
                 'category_id' : place.category.id,
-                # TODO heart 구현
-                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
+                'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0,
                 'related_course' : [{
                     'id'           : course.course.id,
                     'name'         : course.course.name,
                     'duration_time': course.course.duration_time,
                     'price'        : course.course.price,
                     'image_url'    : course.course.image_url,
-                    # TODO heart 구현
-                    # 'heart'    : 1 if Heart.objects.filter(course__id=course.course.id).filter(user=request.user) else 0 if not request.user else 0
+                    'heart'        : 1 if Heart.objects.filter(course__id=course.course.id).filter(user=request.user) else 0 if not request.user else 0
                 } for course in place.courseplace_set.all()]
             }
 
@@ -260,8 +250,7 @@ class NearbyPlaceListView(View):
                 'image_url': place.image_url,
                 'latitude' : place.latitude,
                 'longitude': place.longitude,
-                # TODO 추가구현
-                # 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
+                'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
             }for place in places
         ]
 

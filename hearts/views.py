@@ -39,17 +39,19 @@ class HeartView(View):
         hearts = [{
             'heart_id'       : heart.id,
             'place or course': {
-                    'place_id':heart.place.id, 
-                    'place_name':heart.place.name, 
-                    'place_image_url':heart.place.image_url, 
-                    'heart': 1 if Heart.objects.filter(place__id=heart.place.id).filter(user=request.user) else 0
+                    'type'           : 'place',
+                    'id'             : heart.place.id,
+                    'name'           : heart.place.name,
+                    'image_url': heart.place.image_url,
+                    'heart'          : 1 if Heart.objects.filter(place__id=heart.place.id).filter(user=request.user) else 0
                     if not request.user else 0} 
                 if heart.place
                 else {
-                    'course_id':heart.course.id, 
-                    'course_name':heart.course.name, 
-                    'course_image_url':heart.course.image_url, 
-                    'heart': 1 if Heart.objects.filter(course__id=heart.course.id).filter(user=request.user) else 0 
+                    'type'     : 'course',
+                    'id'       : heart.course.id,
+                    'name'     : heart.course.name,
+                    'image_url': heart.course.image_url,
+                    'heart'    : 1 if Heart.objects.filter(course__id=heart.course.id).filter(user=request.user) else 0
                     if not request.user else 0}
             }for heart in Heart.objects.filter(user=request.user)]
         return JsonResponse({"message" : "SUCCESS", "hearts" : hearts}, status=200)
@@ -61,7 +63,6 @@ class HeartView(View):
             data = QueryDict(request.body)
             if data['type'] == 'c':
                 course = Course.objects.get(id=data.get('course_id'))
-                print(course)
                 Heart.objects.filter(user=request.user, course=course).delete()
 
             if data.get('type') == 'p':

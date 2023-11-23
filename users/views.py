@@ -98,7 +98,7 @@ class LogInView(View):
 
             access_token= jwt.encode({'id': user.id}, settings.SECRET_KEY, settings.ALGORITHM)
 
-            return JsonResponse({'message':'SUCCESS', 'ACCESS_TOKEN':access_token}, status=200)
+            return JsonResponse({'message':'SUCCESS', 'nickname': user.nickname, 'ACCESS_TOKEN':access_token}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({'message':'JSONDecodeError'}, status=400)

@@ -52,9 +52,9 @@ class KakaoSocialLoginView(View):
             )
 
             if created:
-                return JsonResponse({"message" : "SIGNUP_SUCCESS"}, status=201)
+                return JsonResponse({"message" : "SIGNUP_SUCCESS", "nickname" : data['nickname']}, status=201)
             
-            return JsonResponse({"message" : "LOGIN_SUCCESS"}, status=200)
+            return JsonResponse({"message" : "LOGIN_SUCCESS", "nickname" : data['nickname']}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"message" : "JSONDecodeError"}, status=400)
@@ -75,9 +75,9 @@ class NaverSocialLoginView(View):
             )
 
             if created:
-                return JsonResponse({"message" : "SIGNUP_SUCCESS"}, status=201)
+                return JsonResponse({"message" : "SIGNUP_SUCCESS", "nickname" : data['nickname']}, status=201)
             
-            return JsonResponse({"message" : "LOGIN_SUCCESS"}, status=200)
+            return JsonResponse({"message" : "LOGIN_SUCCESS", "nickname" : data['nickname']}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"message" : "JSONDecodeError"}, status=400)

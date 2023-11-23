@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CategoryPlaceListView, FilterPlaceListView, CourseDetailView, PlaceDetailView, NearbyPlaceListView, CourseListView
+from .views import CategoryPlaceListView, FilterPlaceListView, CourseDetailView, PlaceDetailView, NearbyPlaceListView, CourseListView, Top20ListView, RecommendPlaceListView
 urlpatterns = [
     # 카테고리별 장소 목록 페이지
     path('/category<int:category_id>', CategoryPlaceListView.as_view()),
@@ -14,8 +14,8 @@ urlpatterns = [
     path('/place<int:place_id>', PlaceDetailView.as_view()),
     # 거리별 추천 장소 목록 페이지
     path('/nearby', NearbyPlaceListView.as_view()),
-    # top-places - TOP 20 장소 목록 페이지
-
-    # recommend-places - 찜기반 추천 장소 목록 페이지
-
+    # TOP 20 장소 목록 페이지
+    path('', Top20ListView.as_view()),
+    # 찜기반 추천 장소 목록 페이지
+    path('/recommend', RecommendPlaceListView.as_view())
 ]

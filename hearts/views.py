@@ -59,7 +59,6 @@ class HeartView(View):
     def delete(self, request):
         try:
             data = QueryDict(request.body)
-            print(data.get('type'))
             if data['type'] == 'c':
                 course = Course.objects.get(id=data.get('course_id'))
                 print(course)

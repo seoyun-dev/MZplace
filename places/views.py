@@ -1,6 +1,7 @@
 from django.http  import JsonResponse
 from django.views import View
 from django.db.models import Q
+from django.db.models import Count
 
 from places.models import Category, Place, FilterPlace, Filter, Course, CoursePlace
 from hearts.models import Heart
@@ -263,13 +264,42 @@ class NearbyPlaceListView(View):
 
 
 
-####### top-places - TOP 20 장소 목록 페이지
-class top20ListView(View):
+####### TOP 20 장소 목록 페이지
+class Top20ListView(View):
     @signin_decorator
     def get(self,request):
-        pass
+        top_20_places_courses = (
+            Heart.objects.values('place', 'course')
+            .annotate(total_hearts=Count('id'))
+            .order_by('-total_hearts')[:20]
+        )
 
-###### recommend-places - 찜기반 추천 장소 목록 페이지
+        result = [
+            {
+                'place_id'       : Place.objects.get(id=place_or_course['place']).id,
+                'place_name'     : Place.objects.get(id=place_or_course['place']).name,
+                'place_image_url': Place.objects.get(id=place_or_course['place']).image_url,
+                'heart'          : 1 if Heart.objects.filter(place__id=Place.objects.get(id=place_or_course['place']) .id).filter(user=request.user) else 0 if not request.user else 0
+            } 
+            if place_or_course['place']
+            else {
+                'course_id'       : Course.objects.get(id=place_or_course['course']).id,
+                'course_name'     : Course.objects.get(id=place_or_course['course']).name,
+                'course_image_url': Course.objects.get(id=place_or_course['course']).image_url,
+                'heart'           : 1 if Heart.objects.filter(place__id=Course.objects.get(id=place_or_course['course']).id).filter(user=request.user) else 0 if not request.user else 0
+            }
+            for place_or_course in top_20_places_courses
+        ]
+
+        return JsonResponse(
+            {
+                'message'     : 'SUCCESS',
+                'result'      : result,
+            }, status=200)
+
+
+
+###### 찜 기반 추천 장소 목록 페이지
 class RecommendPlaceListView(View):
     @signin_decorator
     def get(self,request):

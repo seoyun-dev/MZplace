@@ -305,4 +305,39 @@ class Top20ListView(View):
 class RecommendPlaceListView(View):
     @signin_decorator
     def get(self,request):
-        pass
+        user   = request.user
+        hearts = Heart.objects.get()
+
+        # 레이블링 알고리즘 수행
+        label_recommendations = calculate_label_recommendations(user)
+
+        # UBCF 알고리즘 수행
+        ubcf_recommendations = calculate_ubcf_recommendations(user)
+
+        # IBCF 알고리즘 수행
+        ibcf_recommendations = calculate_ibcf_recommendations(user)
+
+        # UBCF와 IBCF의 추천 결과를 결합하여 하이브리드 추천 생성
+        hybrid_recommendations = combine_recommendations(ubcf_recommendations, ibcf_recommendations)
+
+        return JsonResponse({
+            'message' : 'SUCCESS',
+            'result'  : hybrid_recommendations
+            }, status=200)
+
+def calculate_label_recommendations(user):
+    # 레이블링을 수행하여 사용자에게 추천할 장소 or 코스 추출
+    pass
+
+def calculate_ubcf_recommendations(user):
+    # UBCF 알고리즘 수행하여 사용자에게 추천할 장소 or 코스 추출
+    pass
+
+def calculate_ibcf_recommendations(user):
+    # IBCF 알고리즘 수행하여 사용자에게 추천할 장소 or 코스 추출
+    pass
+
+def combine_recommendations(label_recommendations, ubcf_recommendations, ibcf_recommendations):
+    # UBCF와 IBCF의 추천 결과를 결합하여 하이브리드 추천 생성하는 방법 구현
+    pass
+

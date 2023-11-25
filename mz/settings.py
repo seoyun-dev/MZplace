@@ -148,6 +148,9 @@ CORS_ALLOW_HEADERS = (
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'local_token',
+    'kakao_id',
+    'naver_id'
 )
 
 # / 관련 에러 제거

@@ -36,24 +36,25 @@ class HeartView(View):
 
     @signin_decorator
     def get(self, request):
-        hearts = [{
-            'heart_id'       : heart.id,
-            'place_or_course': {
-                    'type'           : 'place',
-                    'id'             : heart.place.id,
-                    'name'           : heart.place.name,
-                    'image_url': heart.place.image_url,
-                    'heart'          : 1 if Heart.objects.filter(place__id=heart.place.id).filter(user=request.user) else 0
-                    if not request.user else 0} 
+        hearts = [
+            {
+                'heart_id' : heart.id,
+                'type'     : 'place',
+                'id'       : heart.place.id,
+                'name'     : heart.place.name,
+                'image_url': heart.place.image_url,
+                'heart'    : 1 if Heart.objects.filter(place__id=heart.place.id).filter(user=request.user) else 0
+                if not request.user else 0} 
                 if heart.place
                 else {
+                    'heart_id' : heart.id,
                     'type'     : 'course',
                     'id'       : heart.course.id,
                     'name'     : heart.course.name,
                     'image_url': heart.course.image_url,
                     'heart'    : 1 if Heart.objects.filter(course__id=heart.course.id).filter(user=request.user) else 0
                     if not request.user else 0}
-            }for heart in Heart.objects.filter(user=request.user)]
+            for heart in Heart.objects.filter(user=request.user)]
         return JsonResponse({"message" : "SUCCESS", "hearts" : hearts}, status=200)
     
 

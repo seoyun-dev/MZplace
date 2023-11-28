@@ -54,7 +54,7 @@ class HeartView(View):
                     'image_url': heart.course.image_url,
                     'heart'    : 1 if Heart.objects.filter(course__id=heart.course.id).filter(user=request.user) else 0
                     if not request.user else 0}
-            for heart in Heart.objects.filter(user=request.user)]
+            for heart in Heart.objects.filter(user=request.user).distinct()]
         return JsonResponse({"message" : "SUCCESS", "hearts" : hearts}, status=200)
     
 

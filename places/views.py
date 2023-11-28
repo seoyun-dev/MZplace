@@ -136,7 +136,7 @@ class FilterPlaceListView(View):
                 sub_district_q |= Q(district__icontains = district)
         q &= sub_district_q
 
-        places      = Place.objects.filter(q)
+        places      = Place.objects.filter(q).distinct()
         places_list = places[12*(page-1):12*page]
 
         result = [
@@ -177,6 +177,8 @@ class CourseDetailView(View):
                         'place_id'       : place.place.id,
                         'place_name'     : place.place.name,
                         'place_image_url': place.place.image_url,
+                        'place_latitude' : place.place.latitude,
+                        'place_longitude': place.place.longitude,
                         'heart'          : 1 if Heart.objects.filter(place__id=place.place.id).filter(user=request.user) else 0 if not request.user else 0
                     }
                     for place in course.courseplace_set.all()
@@ -271,6 +273,7 @@ class Top20ListView(View):
         top_20_places_courses = (
             Heart.objects.values('place', 'course')
             .annotate(total_hearts=Count('id'))
+            .distinct()
             .order_by('-total_hearts')[:20]
         )
 
@@ -318,7 +321,7 @@ class RecommendPlaceListView(View):
         ibcf_recommendations = calculate_ibcf_recommendations(user)
 
         # UBCF와 IBCF의 추천 결과를 결합하여 하이브리드 추천 생성
-        hybrid_recommendations = combine_recommendations(ubcf_recommendations, ibcf_recommendations)
+        hybrid_recommendations = combine_recommendations(ubcf_recommendations, ibcf_recommendations).distinct()
 
         return JsonResponse({
             'message' : 'SUCCESS',

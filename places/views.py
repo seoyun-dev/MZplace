@@ -334,7 +334,7 @@ class RecommendPlaceListView(View):
                 'name'     : place.name,
                 'image_url': place.image_url,
                 'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0
-            }for place in recommend_id_list[12*(page-1):12*page]]
+            }for place in recommend_id_list]
 
         return JsonResponse({
             'message'        : 'SUCCESS',

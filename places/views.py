@@ -324,7 +324,6 @@ class RecommendPlaceListView(View):
     @signin_decorator
     def get(self, request):
         user = request.user
-        page = int(request.GET.get('page'))
         
         # 사용자 ID에 해당하는 추천 리스트 가져오기
         recommendations = self.get_recommendations(user.id)

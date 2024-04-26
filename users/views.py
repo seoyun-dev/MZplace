@@ -93,7 +93,6 @@ class LogInView(View):
         try:
             data = json.loads(request.body)
             user = User.objects.get(user_id=data['user_id'])
-            print(jwt.__file__)
             if not bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
                 return JsonResponse({'message':'INVALID_USER'}, status=401)
 

@@ -13,13 +13,13 @@ class HeartView(View):
     def post(self, request):
         try:
             data  = json.loads(request.body)
-            if data['type'] == 'c':
+            if 'course_id' in data:
                 course = Course.objects.get(id=data['course_id'])
                 Heart.objects.create(
                 course = course,
                 user   = request.user
                 )
-            elif data['type'] == 'p':
+            elif 'place_id' in data:
                 place = Place.objects.get(id=data['place_id'])
                 Heart.objects.create(
                 place = place,
@@ -62,11 +62,11 @@ class HeartView(View):
     def delete(self, request):
         try:
             data = QueryDict(request.body)
-            if data['type'] == 'c':
+            if 'course_id' in data:
                 course = Course.objects.get(id=data.get('course_id'))
                 Heart.objects.filter(user=request.user, course=course).delete()
 
-            if data.get('type') == 'p':
+            elif 'place_id' in data:
                 place = Place.objects.get(id=data.get('place_id'))
                 Heart.objects.filter(user=request.user, place=place).delete()
             

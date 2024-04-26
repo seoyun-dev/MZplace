@@ -20,4 +20,5 @@ urlpatterns = [
     path('hearts', include('hearts.urls')),
     path('places', include('places.urls')),
     path('users', include('users.urls')),
+    path('reviews', include('reviews.urls')),
 ]

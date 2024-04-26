@@ -6,8 +6,9 @@ import jwt
 from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views           import View
-from django.conf            import settings
+# from django.conf            import settings
 
+from mz import settings
 from users.models           import User
 from users.utils            import signin_decorator
 
@@ -92,7 +93,7 @@ class LogInView(View):
         try:
             data = json.loads(request.body)
             user = User.objects.get(user_id=data['user_id'])
-
+            print(jwt.__file__)
             if not bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
                 return JsonResponse({'message':'INVALID_USER'}, status=401)
 

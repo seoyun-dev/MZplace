@@ -15,19 +15,17 @@ def signin_decorator(func):
             local_token = request.META.get('HTTP_LOCAL_TOKEN', None)
 
             if kakao_id:
-                print('here kakao')
                 kakao_id = int(kakao_id)
                 user     = User.objects.get(kakao_id=kakao_id)
             elif naver_id:
-                print('here naver')
                 naver_id = int(naver_id)
                 user     = User.objects.get(naver_id=naver_id)
             elif local_token:
-                print('here local')
                 payload = jwt.decode(local_token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
                 user    = User.objects.get(id=payload['id'])
             
             request.user = user
+            print(user)
             return func(self, request, *args, **kwargs)
         
         except User.DoesNotExist:

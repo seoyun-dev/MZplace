@@ -1,6 +1,6 @@
 import json
 
-from django.http  import JsonResponse
+from django.http  import JsonResponse, QueryDict
 from django.views import View
 
 from users.utils import signin_decorator
@@ -88,17 +88,16 @@ class ReviewView(View):
     
     def get(self, request):
         try: 
-            data = json.loads(request.body)
-
-            if 'course_id' in data :
-                course_id = data['course_id']
-                course    = Course.objects.get(id=course_id)
+            type   = request.GET.get('type')
+            number = request.GET.get('num')
+            if type == 'c':
+                course    = Course.objects.get(id=number)
                 reviews   = Review.objects.filter(course=course)
-            elif 'place_id' in data:
-                place_id = data['place_id']
-                place    = Place.objects.get(id=place_id)
+            elif type == 'p':
+                place    = Place.objects.get(id=number)
                 reviews  = Review.objects.filter(place=place)
-
+            else:
+                return JsonResponse({'message': 'CHECK_TYPE'}, status=400)
             result = [{
                     'id'        : review.id,
                     'user'      : review.user.nickname,
@@ -123,8 +122,7 @@ class ReviewView(View):
     @signin_decorator
     def delete(self, request):
         try:
-            data = json.loads(request.body)
-
+            data = QueryDict(request.body)
             if 'course_id' in data :
                 course = Course.objects.get(id=data.get('course_id'))
                 Review.objects.get(user=request.user, course=course).delete()

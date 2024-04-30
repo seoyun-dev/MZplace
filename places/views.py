@@ -31,16 +31,19 @@ class CategoryPlaceListView(View):
         try: 
             category = Category.objects.get(id=category_id)
             page     = int(request.GET.get('page'))
+            rating   = request.GET.get('rating')
             
             q = Q()
             q &= Q(category__name = category.name)
 
             if category_id == 6:
-                ribbon_num = int(request.GET.get('ribbon'))
-                if ribbon_num==0 or ribbon_num==1 or ribbon_num==2 or ribbon_num==3:
-                    q &= Q(description__icontains = str(ribbon_num)+'개')
-                else:
-                    return JsonResponse({'message':'CHECK_RIBBON_NUM'}, status=400)
+                ribbon_num = request.GET.get('ribbon')
+                if ribbon_num:
+                    ribbon_num = int(ribbon_num)
+                    if ribbon_num==0 or ribbon_num==1 or ribbon_num==2 or ribbon_num==3:
+                        q &= Q(description__icontains = str(ribbon_num)+'개')
+                    else:
+                        return JsonResponse({'message':'CHECK_RIBBON_NUM'}, status=400)
 
             else:
                 price    = request.GET.get('price')
@@ -54,9 +57,18 @@ class CategoryPlaceListView(View):
                     else:
                         return JsonResponse({'message':'CHECK_PRICE'}, status=400)
 
-            places      = Place.objects.filter(q).distinct()
+            places = Place.objects.filter(q).distinct()
+
+            if rating:
+                if rating == 'asc':
+                    places = places.annotate(average_rating=Avg('review__rating')).order_by('average_rating', 'id')
+                elif rating == 'des':
+                    places = places.annotate(average_rating=Avg('review__rating')).order_by('-average_rating', 'id')                
+                else:
+                    return JsonResponse({'message':'CHECK_RATING_SORTING_DIRECTION'}, status=400)
+                
             places_list = places[12*(page-1):12*page]
-            
+
             result = [
                 {
                     'id'       : place.id,
@@ -84,6 +96,7 @@ class CourseListView(View):
     def get(self, request):
         page     = int(request.GET.get('page'))
         price    = request.GET.get('price')
+        rating   = request.GET.get('rating')
 
         q = Q()
 
@@ -98,6 +111,16 @@ class CourseListView(View):
                 return JsonResponse({'message':'CHECK_PRICE'}, status=400)
 
         courses      = Course.objects.filter(q).distinct()
+
+        if rating:
+            if rating == 'asc':
+                courses = courses.annotate(average_rating=Avg('review__rating')).order_by('average_rating', 'id')
+            elif rating == 'des':
+                courses = courses.annotate(average_rating=Avg('review__rating')).order_by('-average_rating', 'id')                
+            else:
+                return JsonResponse({'message':'CHECK_RATING_SORTING_DIRECTION'}, status=400)
+        
+
         courses_list = courses[12*(page-1):12*page]
         
         result = [

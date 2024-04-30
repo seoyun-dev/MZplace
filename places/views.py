@@ -8,11 +8,12 @@ from sklearn.model_selection import train_test_split
 from django.http  import JsonResponse
 from django.views import View
 from django.db.models import Q
-from django.db.models import Count
+from django.db.models import Count, Avg
 
-from places.models import Category, Place, FilterPlace, Filter, Course, CoursePlace
-from hearts.models import Heart
-from users.utils   import signin_decorator
+from places.models  import Category, Place, FilterPlace, Filter, Course, CoursePlace
+from hearts.models  import Heart
+from users.utils    import signin_decorator
+from reviews.models import Review
 
 import pandas as pd
 import numpy as np
@@ -30,21 +31,28 @@ class CategoryPlaceListView(View):
         try: 
             category = Category.objects.get(id=category_id)
             page     = int(request.GET.get('page'))
-            price    = request.GET.get('price')
-
+            
             q = Q()
-
             q &= Q(category__name = category.name)
 
-            if price:
-                if price == 'pay':
-                    price = '유료'
-                    q &= Q(price__icontains = price)
-                elif price == 'free':
-                    price = '무료'
-                    q &= Q(price__icontains = price)
+            if category_id == 6:
+                ribbon_num = int(request.GET.get('ribbon'))
+                if ribbon_num==0 or ribbon_num==1 or ribbon_num==2 or ribbon_num==3:
+                    q &= Q(description__icontains = str(ribbon_num)+'개')
                 else:
-                    return JsonResponse({'message':'CHECK_PRICE'}, status=400)
+                    return JsonResponse({'message':'CHECK_RIBBON_NUM'}, status=400)
+
+            else:
+                price    = request.GET.get('price')
+                if price:
+                    if price == 'pay':
+                        price = '유료'
+                        q &= Q(price__icontains = price)
+                    elif price == 'free':
+                        price = '무료'
+                        q &= Q(price__icontains = price)
+                    else:
+                        return JsonResponse({'message':'CHECK_PRICE'}, status=400)
 
             places      = Place.objects.filter(q).distinct()
             places_list = places[12*(page-1):12*page]
@@ -178,15 +186,20 @@ class CourseDetailView(View):
     @signin_decorator
     def get(self, request, course_id):
         try:
-            course = Course.objects.get(id = course_id)
-            course_detail = {
-                'id'           : course.id,
-                'name'         : course.name,
-                'duration_time': course.duration_time,
-                'price'        : course.price,
-                'image_url'    : course.image_url,
-                'heart'        : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0,
-                'places'       : [
+            course         = Course.objects.get(id = course_id)
+            reviews        = Review.objects.filter(course_id=course_id)
+            review_count   = reviews.count()
+            average_rating = reviews.aggregate(Avg('rating'))['rating__avg']  # 평균 점수 계산
+            course_detail  = {
+                'id'            : course.id,
+                'name'          : course.name,
+                'duration_time' : course.duration_time,
+                'price'         : course.price,
+                'image_url'     : course.image_url,
+                'heart'         : 1 if Heart.objects.filter(course__id=course.id).filter(user=request.user) else 0 if not request.user else 0,
+                'reviews_count' : review_count,
+                'average_rating': average_rating if average_rating is not None else 0,
+                'places'        : [
                     {
                         'order_number'   : place.order_number,
                         'place_id'       : place.place.id,
@@ -211,21 +224,26 @@ class PlaceDetailView(View):
     def get(self, request, place_id):
         try:
             place = Place.objects.get(id = place_id)
+            reviews        = Review.objects.filter(place_id=place_id)
+            review_count   = reviews.count()
+            average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
             result = {
-                'id'          : place.id,
-                'name'        : place.name,
-                'district'    : place.district,
-                'latitude'    : place.latitude,
-                'longitude'   : place.longitude,
-                'work_time'   : place.work_time,
-                'price'       : place.price,
-                'phone_number': place.phone_number,
-                'image_url'   : place.image_url,
-                'page_url'    : place.page_url,
-                'description' : place.description,
-                'category_id' : place.category.id,
-                'heart'    : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0,
-                'related_course' : [{
+                'id'            : place.id,
+                'name'          : place.name,
+                'district'      : place.district,
+                'latitude'      : place.latitude,
+                'longitude'     : place.longitude,
+                'work_time'     : place.work_time,
+                'price'         : place.price,
+                'phone_number'  : place.phone_number,
+                'image_url'     : place.image_url,
+                'page_url'      : place.page_url,
+                'description'   : place.description,
+                'category_id'   : place.category.id,
+                'heart'         : 1 if Heart.objects.filter(place__id=place.id).filter(user=request.user) else 0 if not request.user else 0,
+                'reviews_count' : review_count,
+                'average_rating': average_rating if average_rating is not None else 0,
+                'related_course': [{
                     'id'           : course.course.id,
                     'name'         : course.course.name,
                     'duration_time': course.course.duration_time,

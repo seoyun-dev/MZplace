@@ -25,7 +25,6 @@ def signin_decorator(func):
                 user    = User.objects.get(id=payload['id'])
             
             request.user = user
-            print(user)
             return func(self, request, *args, **kwargs)
         
         except User.DoesNotExist:

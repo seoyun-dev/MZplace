@@ -12,18 +12,23 @@ class HeartView(View):
     @signin_decorator
     def post(self, request):
         try:
-            data  = json.loads(request.body)
+            data = json.loads(request.body)
+            user = request.user
             if 'course_id' in data:
                 course = Course.objects.get(id=data['course_id'])
+                if Heart.objects.filter(course=course, user=user).exists():
+                    return JsonResponse({"message": "HEART_ALREADY_EXISTS"}, status=400)
                 Heart.objects.create(
                 course = course,
-                user   = request.user
+                user   = user
                 )
             elif 'place_id' in data:
                 place = Place.objects.get(id=data['place_id'])
+                if Heart.objects.filter(place=place, user=user).exists():
+                    return JsonResponse({"message": "HEART_ALREADY_EXISTS"}, status=400)
                 Heart.objects.create(
                 place = place,
-                user  = request.user
+                user  = user
                 )
             return JsonResponse({"message" : "ADD_TO_HEART_SUCCESS"}, status=201)
 

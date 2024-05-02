@@ -1,5 +1,5 @@
 import json
-import re
+import requests
 
 import bcrypt
 import jwt
@@ -11,7 +11,7 @@ from django.views           import View
 from mz import settings
 from users.models           import User
 from users.utils            import signin_decorator
-
+from core.kakaoapi          import KakaoAPI
 
 class SignUpView(View):
     def post(self, request):
@@ -67,24 +67,46 @@ class KakaoSocialLoginView(View):
 
 class NaverSocialLoginView(View):
     def post(self, request):
-        try:
-            data = json.loads(request.body)
+        # 프론트엔드에서 보낸 토큰을 받아옵니다.
+        access_token = request.body.decode('utf-8')  # 요청 본문에서 토큰 추출
 
-            user, created = User.objects.get_or_create(
-                naver_id   = data['naver_id'],
-                nickname   = data['nickname']
-            )
+        # 네이버 사용자 정보 요청
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        print(access_token)
 
-            if created:
-                return JsonResponse({"message" : "SIGNUP_SUCCESS", "nickname" : data['nickname']}, status=201)
-            
-            return JsonResponse({"message" : "LOGIN_SUCCESS", "nickname" : data['nickname']}, status=200)
+        response = requests.get('https://openapi.naver.com/v1/nid/me', headers=headers)
+        
+        print(response)
+        user_info = response.json()
 
-        except json.JSONDecodeError:
-            return JsonResponse({"message" : "JSONDecodeError"}, status=400)
-    
-        except KeyError:
-            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        print(user_info)
+
+        if response.status_code != 200:
+            return JsonResponse({'message': 'Failed to get user info from Naver'}, status=400)
+
+        # 네이버 API에서 사용자 정보 추출
+        naver_id = user_info.get('response', {}).get('id', None)
+        name = user_info.get('response', {}).get('name', None)
+
+        if not naver_id:
+            return JsonResponse({'message': 'Naver ID not provided'}, status=400)
+
+        # 사용자 정보를 데이터베이스에 저장하거나 업데이트
+        user, created = User.objects.update_or_create(
+            naver_id = naver_id,
+            nickname = name
+        )
+
+        # 응답 데이터 준비
+        data = {
+            'message': 'User signup' if created else 'User login',
+            'name': name,
+            'naver_id': naver_id
+        }
+        return JsonResponse(data, status=200)
 
 
 

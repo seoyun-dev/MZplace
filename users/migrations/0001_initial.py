@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('kakao_id', models.BigIntegerField(blank=True, null=True)),
-                ('naver_id', models.BigIntegerField(blank=True, null=True)),
+                ('naver_id', models.BigIntegerField(blank=True, null=True, max_length=200)),
                 ('nickname', models.CharField(max_length=20)),
                 ('user_id', models.CharField(blank=True, max_length=50, unique=True)),
                 ('password', models.CharField(blank=True, max_length=200)),

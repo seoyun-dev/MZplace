@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from my_settings import DATABASES, SECRET_KEY, ALGORITHM
+from my_settings import DATABASES, SECRET_KEY, ALGORITHM, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, MAIN_DOMAIN
 
 import pymysql
 
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'places',
     'users',
     'hearts',
-    'reviews'
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -158,8 +158,16 @@ CORS_ALLOW_HEADERS = (
     'naver_id',
     'local-token',
     'kakao-id',
-    'naver-id'
+    'naver-id',
+    'naver-token'
 )
 
 # / 관련 에러 제거
 APPEND_SLASH = False
+
+######naver
+MAIN_DOMAIN = MAIN_DOMAIN
+NAVER_CLIENT_ID = NAVER_CLIENT_ID
+NAVER_CLIENT_SECRET = NAVER_CLIENT_SECRET
+
+AUTH_USER_MODEL = 'users.User'

@@ -16,7 +16,7 @@ class Place(models.Model):
     work_time    = models.CharField(max_length=200, blank=True)
     price        = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=100, blank=True)
-    image_url    = models.URLField(max_length=400)
+    image_url    = models.URLField(max_length=500)
     page_url     = models.URLField(max_length=500, blank=True)
     description = models.TextField(blank=True)
     category     = models.ForeignKey('Category', on_delete=models.CASCADE)

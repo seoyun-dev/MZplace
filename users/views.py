@@ -11,7 +11,6 @@ from django.views           import View
 from mz import settings
 from users.models           import User
 from users.utils            import signin_decorator
-from core.kakaoapi          import KakaoAPI
 
 class SignUpView(View):
     def post(self, request):
@@ -67,22 +66,40 @@ class KakaoSocialLoginView(View):
 
 class NaverSocialLoginView(View):
     def post(self, request):
-        # 프론트엔드에서 보낸 토큰을 받아옵니다.
-        access_token = request.body.decode('utf-8')  # 요청 본문에서 토큰 추출
+        ### 프론트한테 코드 받아 네이버 전달 > 네이버에게서 토큰 받기
+        code = request.body.decode('utf-8').strip('"')  # 요청 본문에서 코드 추출
 
+        grant_type    = "authorization_code"
+        client_id     = settings.NAVER_CLIENT_ID
+        client_secret = settings.NAVER_CLIENT_SECRET
+        code          = code
+
+        parameters = f"grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}&code={code}"
+
+        # token request
+        token_request = requests.get(
+            f"https://nid.naver.com/oauth2.0/token?{parameters}"
+        )
+
+        token_response_json = token_request.json()
+        error = token_response_json.get("error", None)
+        print(token_response_json)
+        print(error)
+
+        if error is not None:
+            return JsonResponse({"message" : "🙀 토큰 가져오기 실패!!!"}, status=400)
+        
+        access_token = token_response_json.get("access_token")
+
+        ### 네이버한테서 받은 토큰 다시 네이버한테 전달 > id, user 받기 > 프론트한테 전달
         # 네이버 사용자 정보 요청
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
-        print(access_token)
 
         response = requests.get('https://openapi.naver.com/v1/nid/me', headers=headers)
-        
-        print(response)
         user_info = response.json()
-
-        print(user_info)
 
         if response.status_code != 200:
             return JsonResponse({'message': 'Failed to get user info from Naver'}, status=400)

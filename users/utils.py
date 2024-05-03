@@ -18,7 +18,6 @@ def signin_decorator(func):
                 kakao_id = int(kakao_id)
                 user     = User.objects.get(kakao_id=kakao_id)
             elif naver_id:
-                naver_id = int(naver_id)
                 user     = User.objects.get(naver_id=naver_id)
             elif local_token:
                 payload = jwt.decode(local_token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)

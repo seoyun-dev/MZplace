@@ -25,7 +25,7 @@
 
 |ENV                                                      |                                                   HTTP                                                   |                                                  Deploy                                                 |
 | :----------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------: | 
-| <img src="https://img.shields.io/badge/miniconda3-44A833?style=for-the-badge&logo=anaconda&logoColor=white"> | <img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"> | <img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon AWS&logoColor=white"> <img src ="https://img.shields.io/badge/gunicorn-499848?&style=for-the-badge&logo=gunicorn&logoColor=white"/>
+| <img src="https://img.shields.io/badge/miniconda3-44A833?style=for-the-badge&logo=anaconda&logoColor=white"> | <img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"> | <img src="https://img.shields.io/badge/ec2-FF9900?style=for-the-badge&logo=Amazon ec2&logoColor=white"> <img src ="https://img.shields.io/badge/gunicorn-499848?&style=for-the-badge&logo=gunicorn&logoColor=white"/>
  
  
 ## 모델링

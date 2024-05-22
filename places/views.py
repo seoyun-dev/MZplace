@@ -66,6 +66,8 @@ class CategoryPlaceListView(View):
                     places = places.annotate(average_rating=Avg('review__rating')).order_by('-average_rating', 'id')                
                 else:
                     return JsonResponse({'message':'CHECK_RATING_SORTING_DIRECTION'}, status=400)
+            else:
+                places = places.order_by('?')
                 
             places_list = places[12*(page-1):12*page]
 

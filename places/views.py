@@ -68,7 +68,7 @@ class CategoryPlaceListView(View):
                     return JsonResponse({'message':'CHECK_RATING_SORTING_DIRECTION'}, status=400)
             else:
                 places = places.order_by('?')
-                
+
             places_list = places[12*(page-1):12*page]
 
             result = [
@@ -121,7 +121,8 @@ class CourseListView(View):
                 courses = courses.annotate(average_rating=Avg('review__rating')).order_by('-average_rating', 'id')                
             else:
                 return JsonResponse({'message':'CHECK_RATING_SORTING_DIRECTION'}, status=400)
-        
+        else:
+            courses = courses.order_by('?')
 
         courses_list = courses[12*(page-1):12*page]
         
@@ -184,7 +185,7 @@ class FilterPlaceListView(View):
                 sub_district_q |= Q(district__icontains = district)
         q &= sub_district_q
 
-        places      = Place.objects.filter(q).distinct()
+        places      = Place.objects.filter(q).distinct().order_by('?')
         places_list = places[12*(page-1):12*page]
 
         result = [
@@ -302,7 +303,7 @@ class NearbyPlaceListView(View):
         q &= Q(longitude__gte=ws_longitude)
         q &= Q(longitude__lte=ne_longitude)
 
-        places = Place.objects.filter(q).distinct()
+        places = Place.objects.filter(q).distinct().order_by('?')
         
         result = [
             {

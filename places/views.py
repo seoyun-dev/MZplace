@@ -404,13 +404,16 @@ class RecommendPlaceListView(View):
         item_similarity = cosine_similarity(matrix_dummy_t, matrix_dummy_t)
         item_similarity = pd.DataFrame(item_similarity, index=likes_matrix_t.index, columns=likes_matrix_t.index)
 
-        # UBCF + IBCF hybrid - 추천 장소 id 반환
-        UBCF_list = self.UBCF_recommender(user_id, 50, likes_matrix, user_similarity)
-        IBCF_list = self.IBCF_recommender(user_id, 50, likes_matrix, likes_matrix_t, item_similarity)
-        print(len(set(UBCF_list)), len(set(IBCF_list)), len(set(UBCF_list) & set(IBCF_list)))
-        intersection = list(set(UBCF_list) & set(IBCF_list))
+        # UBCF + IBCF hybrid - 추천 장소 id 반환 (score fusion with best alpha=0.8)
+        UBCF_scores = self.UBCF_scores(user_id, likes_matrix, user_similarity)
+        IBCF_scores = self.IBCF_scores(user_id, likes_matrix, likes_matrix_t, item_similarity)
+        hybrid_scores = self.hybrid_scores(UBCF_scores, IBCF_scores, alpha=0.8)
         
-        return intersection
+        # 상위 50개 추천
+        recommended_items = sorted(hybrid_scores.items(), key=lambda x: x[1], reverse=True)[:50]
+        recommended_ids = [place_id for place_id, _ in recommended_items]
+        
+        return recommended_ids
 
 
     ### func - UBCF를 위한 자가드 유사도 계산 함수
@@ -426,24 +429,18 @@ class RecommendPlaceListView(View):
         return similarities
 
 
-    ### UBCF 추천 함수
-    def UBCF_recommender(self, user_id, n_items, likes_matrix, user_similarity):
+    ### UBCF 추천 함수 (점수 반환)
+    def UBCF_scores(self, user_id, likes_matrix, user_similarity):
         liked_index = likes_matrix.loc[user_id][likes_matrix.loc[user_id] > 0].index
     
         # 현재 사용자와 유사한 사용자들의 찜한 장소의 평균 예상 찜 여부 계산
-        predictions = []
+        predictions = {}
         for place_id in likes_matrix.columns:
             if place_id not in liked_index:
                 prediction = self.CF_UBCF(user_id, place_id, likes_matrix, user_similarity)
-                # 0이 아닌 것은 제외
-                if prediction > 0.4:
-                    predictions.append((place_id, prediction))
+                predictions[place_id] = prediction
         
-        # 예상 찜 여부를 기준으로 내림차순 정렬 -> 내림차순 장소 id 반환
-        predictions.sort(key=lambda x: x[1], reverse=True)
-        recommended_items = [place_id for place_id, _ in predictions[:n_items]]
-        
-        return recommended_items
+        return predictions
 
 
     ### UBCF 알고리즘 함수
@@ -465,48 +462,34 @@ class RecommendPlaceListView(View):
         return predicted_likes
 
 
-    ### IBCF 추천 함수
-    def IBCF_recommender(self, user_id, n_items, likes_matrix, likes_matrix_t, item_similarity):
+    ### IBCF 추천 함수 (점수 반환)
+    def IBCF_scores(self, user_id, likes_matrix, likes_matrix_t, item_similarity):
         liked_index = likes_matrix.loc[user_id][likes_matrix.loc[user_id] > 0].index
         
         # 모든 장소에 대한 예상 찜 여부 계산
-        predictions = []
+        predictions = {}
         for place_id in likes_matrix.columns:
             if place_id not in liked_index:
                 prediction = self.CF_IBCF(user_id, place_id, item_similarity, likes_matrix_t)
-                # 0이 아닌 것은 제외
-                if prediction > 0.4:
-                    predictions.append((place_id, prediction))
+                predictions[place_id] = prediction
         
-        # 예상 찜 여부를 기준으로 내림차순 정렬
-        predictions.sort(key=lambda x: x[1], reverse=True)
-        # 상위 n_items개의 장소를 추천
-        recommended_items = [place_id for place_id, _ in predictions[:n_items]]
-        return recommended_items
+        return predictions
     
 
-    ### IBCF 알고리즘 함수
-    def CF_IBCF(self, user_id, place_id, item_similarity, likes_matrix_t):
-        if place_id in item_similarity:      # 현재 영화가 train set에 있는지 확인
-            # 현재 장소와 다른 장소의 similarity 값 가져오기
-            sim_scores = item_similarity[place_id]
-            # 현 사용자의 모든 찜 값 가져오기
-            user_likes = likes_matrix_t[user_id]            
-            
-            # 사용자가 평가하지 않은 장소 제거
-            none_likes_idx = user_likes[user_likes.isnull()].index
-            user_likes = user_likes.dropna()
-            # 사용자가 평가하지 않은 장소의 similarity 값 제거
-            sim_scores = sim_scores.drop(none_likes_idx)
-            
-            # 현 장소에 대한 예상 찜 계산, 가중치는 현 장소와 사용자가 평가한 장소의 유사도
-            if sim_scores.sum() != 0.0:
-                predicted_likes = np.dot(sim_scores, user_likes) / sim_scores.sum()
-            else:
-                predicted_likes = 0.0
-        else:
-            predicted_likes = 0.0
-        return predicted_likes
+    ### Hybrid 점수 결합 함수 (score fusion)
+    def hybrid_scores(self, ubcf_scores, ibcf_scores, alpha):
+        # UBCF와 IBCF 점수를 정규화한 뒤 alpha 가중치로 결합
+        # alpha=1.0이면 UBCF만 사용, alpha=0.0이면 IBCF만 사용
+        max_ubcf = max(ubcf_scores.values(), default=1.0)
+        max_ibcf = max(ibcf_scores.values(), default=1.0)
+        
+        hybrid_scores = {}
+        for item in set(ubcf_scores) | set(ibcf_scores):
+            ubcf_norm = ubcf_scores.get(item, 0.0) / max_ubcf if max_ubcf > 0 else 0.0
+            ibcf_norm = ibcf_scores.get(item, 0.0) / max_ibcf if max_ibcf > 0 else 0.0
+            hybrid_scores[item] = alpha * ubcf_norm + (1 - alpha) * ibcf_norm
+        
+        return hybrid_scores
 
 
 

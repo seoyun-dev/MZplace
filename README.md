@@ -5,8 +5,9 @@
     - 위치 기반 가까운 장소 추천 기능
     - 장소 및 코스 리뷰 기능
     - 사용자의 찜을 기반으로 맞춤 추천하는 ML 기능
-        - UBCF, IBCF 알고리즘
-    
+        - UBCF, IBCF 알고리즘 기반 Hybrid 추천
+        - UBCF(Jaccard) + IBCF(Cosine) 점수 결합, best alpha=0.8 적용
+        - 추천 평가: Precision@50, Recall@50, NDCG@50 기준 평가
 - FE [Github](https://github.com/JJongsKim/Seoul-Walk)
 
 ## 팀 인원
